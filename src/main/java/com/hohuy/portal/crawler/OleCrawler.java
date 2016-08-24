@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.http.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import com.hohuy.portal.crawler.service.ArticleParser;
@@ -16,6 +17,7 @@ import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 @Component
+@Configuration
 public class OleCrawler extends WebCrawler{
 	private static final Pattern IMAGE_EXTENSIONS = Pattern.compile(".*\\.(bmp|gif|jpg|png)$");
 	
@@ -39,7 +41,7 @@ public class OleCrawler extends WebCrawler{
 	    // TODO: Check if the URL is already defined in our precious MongoDB
 
 	    // Only accept the url if it is in the "www.ics.uci.edu" domain and protocol is "http".
-	    return (href.matches(urlPattern));
+	    return (href.matches("http://ole.vn/nhan-dinh-bong-da/"));
 	  }
 
 	  /**

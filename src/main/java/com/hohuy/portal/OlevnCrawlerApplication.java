@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.hohuy.portal.crawler.CrawlerConfig;
 import com.hohuy.yeubongda.model.Article;
 import com.hohuy.yeubongda.repository.ArticleRepository;
 
 @SpringBootApplication
+@EnableMongoRepositories(basePackages="com.hohuy.yeubongda.repository")
 public class OlevnCrawlerApplication implements CommandLineRunner {
 
 	@Autowired
