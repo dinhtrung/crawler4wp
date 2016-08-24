@@ -5,7 +5,6 @@ package com.hohuy.portal.crawler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
@@ -21,49 +20,35 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 public class CrawlerConfig {
 	private static final Logger logger = LoggerFactory.getLogger(CrawlerConfig.class);
 	
-	@Value("${crawler.threads: 5}")
-	private int numberOfCrawlers;
-	@Value("${crawler.storage-path:'/tmp/crawler'}")
-	private String crawlStorageFolder;
-	@Value("${crawler.max-pages: 100}")
-	private int maxPages;
-	@Value("${crawler.delay: 1000}")
-	private int delay;
-	@Value("${crawler.depth: 2}")
-	private int depth;
-	
-	@Value("${crawler.with-binary: false}")
-	private boolean withBinary;
-	
-
+	private CrawlerConfigProperties cfp = CrawlerConfigProperties.getInstance();
 	public void run() throws Exception {
 		CrawlConfig config = new CrawlConfig();
 
-		config.setCrawlStorageFolder(crawlStorageFolder);
+		config.setCrawlStorageFolder(cfp.getCrawlStorageFolder());
 
 		/*
 		 * Be polite: Make sure that we don't send more than 1 request per
 		 * second (1000 milliseconds between requests).
 		 */
-		config.setPolitenessDelay(delay);
+		config.setPolitenessDelay(cfp.getDelay());
 
 		/*
 		 * You can set the maximum crawl depth here. The default value is -1 for
 		 * unlimited depth
 		 */
-		config.setMaxDepthOfCrawling(depth);
+		config.setMaxDepthOfCrawling(cfp.getDepth());
 
 		/*
 		 * You can set the maximum number of pages to crawl. The default value
 		 * is -1 for unlimited number of pages
 		 */
-		config.setMaxPagesToFetch(maxPages);
+		config.setMaxPagesToFetch(cfp.getMaxPages());
 
 		/**
 		 * Do you want crawler4j to crawl also binary data ? example: the
 		 * contents of pdf, or the metadata of images etc
 		 */
-		config.setIncludeBinaryContentInCrawling(withBinary);
+		config.setIncludeBinaryContentInCrawling(cfp.isWithBinary());
 
 		/*
 		 * Do you need to set a proxy? If so, you can use:
@@ -108,7 +93,7 @@ public class CrawlerConfig {
 		 * Start the crawl. This is a blocking operation, meaning that your code
 		 * will reach the line after this only when crawling is finished.
 		 */
-		controller.start(OleCrawler.class, numberOfCrawlers);
+		controller.start(OleCrawler.class, cfp.getNumberOfCrawlers());
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -119,24 +104,10 @@ public class CrawlerConfig {
 			return;
 		}
 		CrawlerConfig crawler = new CrawlerConfig();
-		crawler.setCrawlStorageFolder(args[0]);
-		crawler.setNumberOfCrawlers(Integer.parseInt(args[1]));
+//		crawler.setCrawlStorageFolder(args[0]);
+//		crawler.setNumberOfCrawlers(Integer.parseInt(args[1]));
 		crawler.run();
 	}
 
-	public int getNumberOfCrawlers() {
-		return numberOfCrawlers;
-	}
 
-	public void setNumberOfCrawlers(int numberOfCrawlers) {
-		this.numberOfCrawlers = numberOfCrawlers;
-	}
-
-	public String getCrawlStorageFolder() {
-		return crawlStorageFolder;
-	}
-
-	public void setCrawlStorageFolder(String crawlStorageFolder) {
-		this.crawlStorageFolder = crawlStorageFolder;
-	}
 }

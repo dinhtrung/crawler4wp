@@ -1,11 +1,8 @@
 package com.hohuy.portal.crawler;
 
-import java.util.regex.Pattern;
 import java.util.Set;
+import java.util.regex.Pattern;
 
-import org.apache.http.Header;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +18,7 @@ import edu.uci.ics.crawler4j.url.WebURL;
 public class OleCrawler extends WebCrawler{
 	private static final Pattern IMAGE_EXTENSIONS = Pattern.compile(".*\\.(bmp|gif|jpg|png)$");
 	
-	@Value("${crawler.ole.url-pattern: 'http://ole.vn/nhan-dinh-bong-da/'}")
-	private String urlPattern;
+	
 	
 //	@Autowired
 //	private ArticleParser parser;
