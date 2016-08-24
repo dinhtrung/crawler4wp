@@ -21,19 +21,19 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 public class CrawlerConfig {
 	private static final Logger logger = LoggerFactory.getLogger(CrawlerConfig.class);
 	
-	@Value("${crawler.threads}")
-	private int numberOfCrawlers = 5;
-	@Value("${crawler.storage-path}")
-	private String crawlStorageFolder = "/tmp/crawler";
-	@Value("${crawler.max-pages}")
-	private int maxPages = 15;
-	@Value("${crawler.delay}")
-	private int delay = 1000;
-	@Value("${crawler.depth}")
-	private int depth = 2;
+	@Value("${crawler.threads: 5}")
+	private int numberOfCrawlers;
+	@Value("${crawler.storage-path:'/tmp/crawler'}")
+	private String crawlStorageFolder;
+	@Value("${crawler.max-pages: 100}")
+	private int maxPages;
+	@Value("${crawler.delay: 1000}")
+	private int delay;
+	@Value("${crawler.depth: 2}")
+	private int depth;
 	
-	@Value("${crawler.with-binary}")
-	private boolean withBinary = false;
+	@Value("${crawler.with-binary: false}")
+	private boolean withBinary;
 	
 
 	public void run() throws Exception {

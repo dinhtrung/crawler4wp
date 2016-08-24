@@ -15,11 +15,11 @@ import java.io.IOException;
 @Service("OleArticleParser")
 public class OleArticleParser implements ArticleParser {
 	
-	@Value("${crawler.ole.title-selector}")
-	private String titleSelector = ".leftCol h1";
+	@Value("${crawler.ole.title-selector: '.leftCol h1'}")
+	private String titleSelector;
 	
-	@Value("${crawler.ole.body-selector}")
-	private String fullcontentSelector = ".fulltext_content";
+	@Value("${crawler.ole.body-selector: '.fulltext_content'}")
+	private String fullcontentSelector;
 	
 	@Autowired
 	private ArticleRepository articleRepo;
