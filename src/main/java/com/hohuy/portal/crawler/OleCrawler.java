@@ -4,14 +4,26 @@ import java.util.regex.Pattern;
 import java.util.Set;
 
 import org.apache.http.Header;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import com.hohuy.portal.crawler.service.ArticleParser;
+import com.hohuy.portal.crawler.service.impl.OleArticleParser;
 
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
-
+@Component
 public class OleCrawler extends WebCrawler{
 	private static final Pattern IMAGE_EXTENSIONS = Pattern.compile(".*\\.(bmp|gif|jpg|png)$");
+	
+	@Value("${crawler.ole.url-pattern}")
+	private String urlPattern = "http://ole.vn/nhan-dinh-bong-da/";
+	
+	@Autowired
+	private ArticleParser parser;
 
 	  /**
 	   * You should implement this function to specify whether the given url
@@ -27,10 +39,7 @@ public class OleCrawler extends WebCrawler{
 	    // TODO: Check if the URL is already defined in our precious MongoDB
 
 	    // Only accept the url if it is in the "www.ics.uci.edu" domain and protocol is "http".
-	    if (href.startsWith("http://ole.vn/nhan-dinh-bong-da/")){
-	    	return true;
-	    }
-	    return false;
+	    return (href.matches(urlPattern));
 	  }
 
 	  /**
@@ -57,27 +66,11 @@ public class OleCrawler extends WebCrawler{
 
 	    if (page.getParseData() instanceof HtmlParseData) {
 	      HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-	      String text = htmlParseData.getText();
 	      String html = htmlParseData.getHtml();
 	      
-	      
-	      
+	      parser.parseAndSaveHtml(html, url);
 	      
 	      Set<WebURL> links = htmlParseData.getOutgoingUrls();
-
-	      logger.debug("Text length: {}", text.length());
-	      logger.debug("Html length: {}", html.length());
-	      logger.debug("Number of outgoing links: {}", links.size());
 	    }
-
-	    Header[] responseHeaders = page.getFetchResponseHeaders();
-	    if (responseHeaders != null) {
-	      logger.debug("Response headers:");
-	      for (Header header : responseHeaders) {
-	        logger.debug("\t{}: {}", header.getName(), header.getValue());
-	      }
-	    }
-
-	    logger.debug("=============");
 	  }
 }
