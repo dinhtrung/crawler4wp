@@ -1,19 +1,37 @@
 package com.hohuy.portal.crawler.service.impl;
+import java.io.IOException;
+
+import javax.annotation.PostConstruct;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import com.hohuy.portal.crawler.service.ArticleParser;
 import com.hohuy.yeubongda.model.Article;
 import com.hohuy.yeubongda.repository.ArticleRepository;
 
-import java.io.IOException;
-
-@Service("OleArticleParser")
+@Component
+@Scope("singleton")
 public class OleArticleParser implements ArticleParser {
+	
+	private static OleArticleParser oleArticleParser;
+	
+	private OleArticleParser() {
+	}
+	
+	public static OleArticleParser getInstance() {
+		return oleArticleParser;
+	}
+
+	@PostConstruct
+	private void load() {
+		oleArticleParser = this;
+	}
 	
 	@Value("${crawler.ole.title-selector: '.leftCol h1'}")
 	private String titleSelector;

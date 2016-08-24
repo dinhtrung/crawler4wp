@@ -24,8 +24,8 @@ public class OleCrawler extends WebCrawler{
 	@Value("${crawler.ole.url-pattern: 'http://ole.vn/nhan-dinh-bong-da/'}")
 	private String urlPattern;
 	
-	@Autowired
-	private ArticleParser parser;
+//	@Autowired
+//	private ArticleParser parser;
 
 	  /**
 	   * You should implement this function to specify whether the given url
@@ -70,6 +70,7 @@ public class OleCrawler extends WebCrawler{
 	      HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 	      String html = htmlParseData.getHtml();
 	      
+	      ArticleParser parser = OleArticleParser.getInstance();
 	      parser.parseAndSaveHtml(html, url);
 	      
 	      Set<WebURL> links = htmlParseData.getOutgoingUrls();
