@@ -3,8 +3,6 @@
  */
 package com.hohuy.portal.crawler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
@@ -18,10 +16,9 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
  */
 @Component
 public class CrawlerConfig {
-	private static final Logger logger = LoggerFactory.getLogger(CrawlerConfig.class);
 	
-	private CrawlerConfigProperties cfp = CrawlerConfigProperties.getInstance();
 	public void run() throws Exception {
+		CrawlerConfigProperties cfp = CrawlerConfigProperties.getInstance();
 		CrawlConfig config = new CrawlConfig();
 
 		config.setCrawlStorageFolder(cfp.getCrawlStorageFolder());
@@ -84,9 +81,8 @@ public class CrawlerConfig {
 		// controller.addSeed("http://www.ics.uci.edu/");
 		// controller.addSeed("http://www.ics.uci.edu/~lopes/");
 		// controller.addSeed("http://www.ics.uci.edu/~welling/");
-		controller.addSeed("http://ole.vn/nhan-dinh-bong-da.html");
-		for (int i = 1; i < 5; i++) {
-			controller.addSeed("http://ole.vn/tintuc/loadMore/catid/100/page/" + i);
+		for (String page:cfp.getSeedPages()){
+			controller.addSeed(page);
 		}
 
 		/*
@@ -95,19 +91,4 @@ public class CrawlerConfig {
 		 */
 		controller.start(OleCrawler.class, cfp.getNumberOfCrawlers());
 	}
-
-	public static void main(String[] args) throws Exception {
-		if (args.length != 2) {
-			logger.info("Needed parameters: ");
-			logger.info("\t rootFolder (it will contain intermediate crawl data)");
-			logger.info("\t numberOfCralwers (number of concurrent threads)");
-			return;
-		}
-		CrawlerConfig crawler = new CrawlerConfig();
-//		crawler.setCrawlStorageFolder(args[0]);
-//		crawler.setNumberOfCrawlers(Integer.parseInt(args[1]));
-		crawler.run();
-	}
-
-
 }

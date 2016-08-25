@@ -1,21 +1,23 @@
 package com.hohuy.portal.crawler;
 
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import com.hohuy.portal.crawler.service.ArticleParser;
-import com.hohuy.portal.crawler.service.impl.OleArticleParser;
+import com.hohuy.portal.crawler.service.impl.ArticleParserImpl;
 
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
+import uk.org.lidalia.slf4jext.Logger;
+import uk.org.lidalia.slf4jext.LoggerFactory;
 @Component
 @Configuration
 public class OleCrawler extends WebCrawler{
+	protected static final Logger logger = LoggerFactory.getLogger(OleCrawler.class);
 	private static final Pattern IMAGE_EXTENSIONS = Pattern.compile(".*\\.(bmp|gif|jpg|png)$");
 	
 	
@@ -35,9 +37,9 @@ public class OleCrawler extends WebCrawler{
 	      return false;
 	    }
 	    // TODO: Check if the URL is already defined in our precious MongoDB
-
+	    ArticleParser parser = ArticleParserImpl.getInstance();
 	    // Only accept the url if it is in the "www.ics.uci.edu" domain and protocol is "http".
-	    return (href.matches("http://ole.vn/nhan-dinh-bong-da/"));
+	    return parser.shouldGrab(url.getURL());
 	  }
 
 	  /**
@@ -66,10 +68,8 @@ public class OleCrawler extends WebCrawler{
 	      HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 	      String html = htmlParseData.getHtml();
 	      
-	      ArticleParser parser = OleArticleParser.getInstance();
+	      ArticleParser parser = ArticleParserImpl.getInstance();
 	      parser.parseAndSaveHtml(html, url);
-	      
-	      Set<WebURL> links = htmlParseData.getOutgoingUrls();
 	    }
 	  }
 }

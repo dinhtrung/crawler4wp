@@ -1,9 +1,12 @@
 package com.hohuy.yeubongda.model;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection="olevn")
+@Document
+//(collection="${crawler.db.collection: olevn}")
 public class Article {
 	@Id
     private String id;
@@ -11,8 +14,14 @@ public class Article {
     private String title;
     private String srcUrl;
     private String fullcontent;
+    private Date publishAt;
+    private String featureImgUrl;
 
     public Article() {}
+    
+    public String getCollection(){
+    	return "olevn";
+    }
 
     @Override
     public String toString() {
@@ -43,5 +52,21 @@ public class Article {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public Date getPublishAt() {
+		return publishAt;
+	}
+
+	public void setPublishAt(Date publishAt) {
+		this.publishAt = publishAt;
+	}
+
+	public String getFeatureImgUrl() {
+		return featureImgUrl;
+	}
+
+	public void setFeatureImgUrl(String featureImgUrl) {
+		this.featureImgUrl = featureImgUrl;
 	}
 }

@@ -8,4 +8,6 @@ public interface ArticleParser {
 	boolean parseAndSaveHtml(String srcUrl);
 
 	boolean parseAndSaveHtml(Document doc, String srcUrl);
+
+	boolean shouldGrab(String url);
 }

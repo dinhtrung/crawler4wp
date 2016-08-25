@@ -1,5 +1,7 @@
 package com.hohuy.portal.crawler;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +40,10 @@ public class CrawlerConfigProperties {
 	
 	@Value("${crawler.ole.url-pattern: 'http://ole.vn/nhan-dinh-bong-da/'}")
 	private String urlPattern;
+	@Value("#{'${crawler.seed-pages}'.split(',')}")
+	private List<String> seedPages;
+	
+	
 	public static CrawlerConfigProperties getConfigProperties() {
 		return configProperties;
 	}
@@ -69,6 +75,41 @@ public class CrawlerConfigProperties {
 	public String getUrlPattern() {
 		return urlPattern;
 	}
-	
-	
+
+	public List<String> getSeedPages() {
+		return seedPages;
+	}
+
+	public void setSeedPages(List<String> seedPages) {
+		this.seedPages = seedPages;
+	}
+
+	public void setNumberOfCrawlers(int numberOfCrawlers) {
+		this.numberOfCrawlers = numberOfCrawlers;
+	}
+
+	public void setCrawlStorageFolder(String crawlStorageFolder) {
+		this.crawlStorageFolder = crawlStorageFolder;
+	}
+
+	public void setMaxPages(int maxPages) {
+		this.maxPages = maxPages;
+	}
+
+	public void setDelay(int delay) {
+		this.delay = delay;
+	}
+
+	public void setDepth(int depth) {
+		this.depth = depth;
+	}
+
+	public void setWithBinary(boolean withBinary) {
+		this.withBinary = withBinary;
+	}
+
+	public void setUrlPattern(String urlPattern) {
+		this.urlPattern = urlPattern;
+	}
+
 }
