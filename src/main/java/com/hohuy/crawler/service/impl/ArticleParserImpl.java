@@ -51,25 +51,26 @@ public class ArticleParserImpl implements ArticleParser{
 		logger.info("== Gotta grep PublishAt attribute from " + timeSelector);
 		logger.info("== Gotta grep Tags attribute from " + tagSelector);
 		
-		datePattern = Pattern.compile(dateFmt.replaceAll("dMy", "\\d"));
+		datePattern = Pattern.compile(dateFmt.replaceAll("[dMy]", "\\d"));
+		logger.info("== Date format: " + dateFmt + " == Pattern " + datePattern.pattern());
 	}
 	
-	@Value("${crawler.article.title-selector: '.leftCol h1'}")
+	@Value("${crawler.article.title-selector: .leftCol h1}")
 	private String titleSelector;
 	
-	@Value("${crawler.article.body-selector: '.fulltext_content'}")
+	@Value("${crawler.article.body-selector: .fulltext_content}")
 	private String fullcontentSelector;
 	
-	@Value("${crawler.article.time-selector:'.cate_time'}")
+	@Value("${crawler.article.time-selector:.cate_time}")
 	private String timeSelector;
 	
-	@Value("${crawler.article.img-selector:'.dtBoxl img'}")
+	@Value("${crawler.article.img-selector:.dtBoxl img}")
 	private String imgSelector;
 	
 	@Value("${crawler.article.urlRegexp}")
 	private String urlRegexp;
 	
-	@Value("${crawler.article.main-category:'article'}")
+	@Value("${crawler.article.main-category:article}")
 	private String category;
 	
 	@Value("${crawler.article.tag-selector:.tag}")
@@ -80,7 +81,7 @@ public class ArticleParserImpl implements ArticleParser{
 	
 	private Pattern hourPattern = Pattern.compile("\\d{2}:\\d{2}");
 	
-	@Value("${crawler.article.dateFmt:'dd/MM/yyyy'}")
+	@Value("${crawler.article.dateFmt:dd/MM/yyyy}")
 	private String dateFmt; 
 	private Pattern datePattern;
 	
@@ -118,7 +119,7 @@ public class ArticleParserImpl implements ArticleParser{
         	if (!fulltext_content.isEmpty()){
         		String fulltext_html = "";
         		for (Element e : fulltext_content){
-        			fulltext_content.append(e.html());
+        			fulltext_html += e.html();
         		}
         		entity.setFullcontent(fulltext_html);
         	}
@@ -131,11 +132,13 @@ public class ArticleParserImpl implements ArticleParser{
     				Matcher hourMatcher = hourPattern.matcher(timeString);
     				Matcher dateMatcher = datePattern.matcher(timeString);
     				
-    				if (hourMatcher.find() && dateMatcher.find()){
-    					entity.setPublishAt(fmt.parse(dateMatcher.group() + " " + hourMatcher.group()));
-    				} else if (dateMatcher.find()){
-    					entity.setPublishAt(fmt.parse(dateMatcher.group() + " 00:00"));
-    				}
+    				if (dateMatcher.find()){
+    					if (hourMatcher.find())
+    						entity.setPublishAt(fmt.parse(dateMatcher.group() + " " + hourMatcher.group()));
+    					else 
+    						entity.setPublishAt(fmt.parse(dateMatcher.group() + " 00:00"));
+    				} else 
+    					entity.setPublishAt(new Date());
     			} catch (Exception e) {
     				// TODO Auto-generated catch block
     				logger.error("Cannot parse date string" + timeString);
