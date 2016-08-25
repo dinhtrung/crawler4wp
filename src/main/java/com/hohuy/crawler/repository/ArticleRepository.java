@@ -1,10 +1,10 @@
-package com.hohuy.yeubongda.repository;
-
-import com.hohuy.yeubongda.model.Article;
+package com.hohuy.crawler.repository;
 
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.hohuy.crawler.model.Article;
 
 public interface ArticleRepository  extends MongoRepository<Article, String> {
 	public Article findBySrcUrl(String srcUrl);

@@ -1,6 +1,8 @@
-package com.hohuy.yeubongda.model;
+package com.hohuy.crawler.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,16 +15,17 @@ public class Article {
 
     private String title;
     private String srcUrl;
+    private String baseUrl;
     private String fullcontent;
     private Date publishAt;
     private String featureImgUrl;
+    private String cate;
+    private List<String> tags;
 
-    public Article() {}
-    
-    public String getCollection(){
-    	return "olevn";
+    public Article() {
+    	tags = new ArrayList<String>();
     }
-
+    
     @Override
     public String toString() {
         return String.format(
@@ -68,5 +71,29 @@ public class Article {
 
 	public void setFeatureImgUrl(String featureImgUrl) {
 		this.featureImgUrl = featureImgUrl;
+	}
+
+	public String getCate() {
+		return cate;
+	}
+
+	public void setCate(String cate) {
+		this.cate = cate;
+	}
+
+	public List<String> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<String> tags) {
+		this.tags = tags;
+	}
+
+	public String getBaseUrl() {
+		return baseUrl;
+	}
+
+	public void setBaseUrl(String baseUrl) {
+		this.baseUrl = baseUrl;
 	}
 }

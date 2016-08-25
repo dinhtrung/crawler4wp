@@ -1,4 +1,4 @@
-package com.hohuy.portal.crawler.service;
+package com.hohuy.crawler.service;
 
 import org.jsoup.nodes.Document;
 

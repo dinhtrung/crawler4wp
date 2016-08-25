@@ -1,9 +1,10 @@
-# MPS Integration
-# http://IP:5267/sclip/web-service/[subscribe|receive-result|get-content|mo-listener]
-web:
+# Web Crawler
+app:
   image: anapsix/alpine-java
   environment:
     TZ: 'Asia/Ho_Chi_Minh'
   volumes:
     - ./target:/root
-  command: /root/run.sh
+  extra_hosts:
+    - "mongodb:172.17.0.1"
+  command: tail -f /root/run.sh

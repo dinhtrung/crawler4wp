@@ -1,4 +1,4 @@
-package com.hohuy.portal.crawler;
+package com.hohuy.crawler.component;
 
 import java.util.List;
 
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("singleton")
-public class CrawlerConfigProperties {
-	private static CrawlerConfigProperties configProperties;
-	private CrawlerConfigProperties() {
+public class ArticleCrawlerConfig {
+	private static ArticleCrawlerConfig configProperties;
+	private ArticleCrawlerConfig() {
 	}
 
-	public static CrawlerConfigProperties getInstance() {
+	public static ArticleCrawlerConfig getInstance() {
 		return configProperties;
 	}
 
@@ -38,13 +38,14 @@ public class CrawlerConfigProperties {
 	@Value("${crawler.with-binary: false}")
 	private boolean withBinary;
 	
-	@Value("${crawler.ole.url-pattern: 'http://ole.vn/nhan-dinh-bong-da/'}")
-	private String urlPattern;
 	@Value("#{'${crawler.seed-pages}'.split(',')}")
 	private List<String> seedPages;
 	
+	@Value("${crawler.user-agent: 'Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'}")
+	private String userAgent;
 	
-	public static CrawlerConfigProperties getConfigProperties() {
+	
+	public static ArticleCrawlerConfig getConfigProperties() {
 		return configProperties;
 	}
 
@@ -70,10 +71,6 @@ public class CrawlerConfigProperties {
 
 	public boolean isWithBinary() {
 		return withBinary;
-	}
-
-	public String getUrlPattern() {
-		return urlPattern;
 	}
 
 	public List<String> getSeedPages() {
@@ -108,8 +105,8 @@ public class CrawlerConfigProperties {
 		this.withBinary = withBinary;
 	}
 
-	public void setUrlPattern(String urlPattern) {
-		this.urlPattern = urlPattern;
+	public String getUserAgent() {
+		return this.userAgent;
 	}
 
 }

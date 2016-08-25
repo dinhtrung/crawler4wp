@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hohuy.portal.crawler;
+package com.hohuy.crawler.component;
 
 import org.springframework.stereotype.Component;
 
@@ -15,11 +15,13 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
  * @author Yasser Ganjisaffar
  */
 @Component
-public class CrawlerConfig {
+public class ArticleCrawlerController {
 	
 	public void run() throws Exception {
-		CrawlerConfigProperties cfp = CrawlerConfigProperties.getInstance();
+		ArticleCrawlerConfig cfp = ArticleCrawlerConfig.getInstance();
 		CrawlConfig config = new CrawlConfig();
+		
+		config.setUserAgentString(cfp.getUserAgent());
 
 		config.setCrawlStorageFolder(cfp.getCrawlStorageFolder());
 
@@ -89,6 +91,6 @@ public class CrawlerConfig {
 		 * Start the crawl. This is a blocking operation, meaning that your code
 		 * will reach the line after this only when crawling is finished.
 		 */
-		controller.start(OleCrawler.class, cfp.getNumberOfCrawlers());
+		controller.start(ArticleCrawler.class, cfp.getNumberOfCrawlers());
 	}
 }
