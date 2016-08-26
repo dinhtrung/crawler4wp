@@ -51,7 +51,7 @@ public class ArticleParserImpl implements ArticleParser{
 		logger.info("== Gotta grep PublishAt attribute from " + timeSelector);
 		logger.info("== Gotta grep Tags attribute from " + tagSelector);
 		
-		datePattern = Pattern.compile(dateFmt.replaceAll("[dMy]", "\\\\d"));
+		datePattern = Pattern.compile(dateFmt.replaceAll("[dMy]", "\\\\d?"));
 		logger.info("== Date format: " + dateFmt + " == Pattern " + datePattern.pattern());
 	}
 	
