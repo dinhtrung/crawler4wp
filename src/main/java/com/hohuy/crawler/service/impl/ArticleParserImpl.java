@@ -51,7 +51,7 @@ public class ArticleParserImpl implements ArticleParser{
 		logger.info("== Gotta grep PublishAt attribute from " + timeSelector);
 		logger.info("== Gotta grep Tags attribute from " + tagSelector);
 		
-		datePattern = Pattern.compile(dateFmt.replaceAll("[dMy]", "\\d"));
+		datePattern = Pattern.compile(dateFmt.replaceAll("[dMy]", "\\\\d"));
 		logger.info("== Date format: " + dateFmt + " == Pattern " + datePattern.pattern());
 	}
 	
@@ -127,18 +127,26 @@ public class ArticleParserImpl implements ArticleParser{
         	Elements time = doc.select(timeSelector);
         	if (!time.isEmpty()){
         		String timeString = time.get(0).html();
+        		logger.info("Found a time string: " + timeString);
         		SimpleDateFormat fmt = new SimpleDateFormat(dateFmt + " hh:mm");
     			try {
     				Matcher hourMatcher = hourPattern.matcher(timeString);
     				Matcher dateMatcher = datePattern.matcher(timeString);
     				
     				if (dateMatcher.find()){
-    					if (hourMatcher.find())
-    						entity.setPublishAt(fmt.parse(dateMatcher.group() + " " + hourMatcher.group()));
-    					else 
+    					if (hourMatcher.find()){
+    						String normalizedTimeString = dateMatcher.group() + " " + hourMatcher.group();
+    						logger.info("Found normallized timeString: " + normalizedTimeString + " -- parse with format :" + dateFmt + " hh:mm");
+    						entity.setPublishAt(fmt.parse(normalizedTimeString));
+    					} else {
+    						String normalizedTimeString = dateMatcher.group() + " 00:00";
+    						logger.info("Found normallized timeString: " + normalizedTimeString + " -- parse with format :" + dateFmt + " hh:mm");
     						entity.setPublishAt(fmt.parse(dateMatcher.group() + " 00:00"));
-    				} else 
+    					}
+    				} else {
+    					logger.error("Cannot find any date time value with timeString. Please check your configuration..");
     					entity.setPublishAt(new Date());
+    				}
     			} catch (Exception e) {
     				// TODO Auto-generated catch block
     				logger.error("Cannot parse date string" + timeString);
