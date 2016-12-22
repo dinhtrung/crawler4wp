@@ -28,26 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "wp_posts")
 @XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "WpPosts.findAll", query = "SELECT w FROM WpPosts w"),
-    @NamedQuery(name = "WpPosts.findById", query = "SELECT w FROM WpPosts w WHERE w.id = :id"),
-    @NamedQuery(name = "WpPosts.findByPostAuthor", query = "SELECT w FROM WpPosts w WHERE w.postAuthor = :postAuthor"),
-    @NamedQuery(name = "WpPosts.findByPostDate", query = "SELECT w FROM WpPosts w WHERE w.postDate = :postDate"),
-    @NamedQuery(name = "WpPosts.findByPostDateGmt", query = "SELECT w FROM WpPosts w WHERE w.postDateGmt = :postDateGmt"),
-    @NamedQuery(name = "WpPosts.findByPostStatus", query = "SELECT w FROM WpPosts w WHERE w.postStatus = :postStatus"),
-    @NamedQuery(name = "WpPosts.findByCommentStatus", query = "SELECT w FROM WpPosts w WHERE w.commentStatus = :commentStatus"),
-    @NamedQuery(name = "WpPosts.findByPingStatus", query = "SELECT w FROM WpPosts w WHERE w.pingStatus = :pingStatus"),
-    @NamedQuery(name = "WpPosts.findByPostPassword", query = "SELECT w FROM WpPosts w WHERE w.postPassword = :postPassword"),
-    @NamedQuery(name = "WpPosts.findByPostName", query = "SELECT w FROM WpPosts w WHERE w.postName = :postName"),
-    @NamedQuery(name = "WpPosts.findByPostModified", query = "SELECT w FROM WpPosts w WHERE w.postModified = :postModified"),
-    @NamedQuery(name = "WpPosts.findByPostModifiedGmt", query = "SELECT w FROM WpPosts w WHERE w.postModifiedGmt = :postModifiedGmt"),
-    @NamedQuery(name = "WpPosts.findByPostParent", query = "SELECT w FROM WpPosts w WHERE w.postParent = :postParent"),
-    @NamedQuery(name = "WpPosts.findByGuid", query = "SELECT w FROM WpPosts w WHERE w.guid = :guid"),
-    @NamedQuery(name = "WpPosts.findByMenuOrder", query = "SELECT w FROM WpPosts w WHERE w.menuOrder = :menuOrder"),
-    @NamedQuery(name = "WpPosts.findByPostType", query = "SELECT w FROM WpPosts w WHERE w.postType = :postType"),
-    @NamedQuery(name = "WpPosts.findByPostMimeType", query = "SELECT w FROM WpPosts w WHERE w.postMimeType = :postMimeType"),
-    @NamedQuery(name = "WpPosts.findByCommentCount", query = "SELECT w FROM WpPosts w WHERE w.commentCount = :commentCount")})
-public class WpPosts implements Serializable {
+public class WpPost implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -132,14 +113,22 @@ public class WpPosts implements Serializable {
     @Column(name = "comment_count")
     private long commentCount;
 
-    public WpPosts() {
+    public WpPost() {
+    	this.commentStatus="open";
+    	this.pingStatus = "open";
+    	this.postStatus = "publish";
+    	this.postType = "post";
+    	this.postMimeType="";
+    	this.postAuthor=0;
+    	this.postContentFiltered="";
+    	this.postExcerpt="";
     }
 
-    public WpPosts(Long id) {
+    public WpPost(Long id) {
         this.id = id;
     }
 
-    public WpPosts(Long id, long postAuthor, Date postDate, Date postDateGmt, String postContent, String postTitle, String postExcerpt, String postStatus, String commentStatus, String pingStatus, String postPassword, String postName, String toPing, String pinged, Date postModified, Date postModifiedGmt, String postContentFiltered, long postParent, String guid, int menuOrder, String postType, String postMimeType, long commentCount) {
+    public WpPost(Long id, long postAuthor, Date postDate, Date postDateGmt, String postContent, String postTitle, String postExcerpt, String postStatus, String commentStatus, String pingStatus, String postPassword, String postName, String toPing, String pinged, Date postModified, Date postModifiedGmt, String postContentFiltered, long postParent, String guid, int menuOrder, String postType, String postMimeType, long commentCount) {
         this.id = id;
         this.postAuthor = postAuthor;
         this.postDate = postDate;
@@ -359,10 +348,10 @@ public class WpPosts implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof WpPosts)) {
+        if (!(object instanceof WpPost)) {
             return false;
         }
-        WpPosts other = (WpPosts) object;
+        WpPost other = (WpPost) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }

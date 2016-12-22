@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.hohuy.crawler.component.ArticleCrawlerController;
 
 @SpringBootApplication
-@EnableMongoRepositories(basePackages="com.hohuy.crawler.repository")
+@EnableJpaRepositories(basePackages="com.hohuy.crawler.repository")
 public class CrawlerApplication implements CommandLineRunner {
 
 	@Autowired
