@@ -1,7 +1,12 @@
 package com.hohuy.crawler.service.impl;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,13 +16,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.hohuy.crawler.model.WpPost;
-import com.hohuy.crawler.repository.WpPostRepository;
+import com.hohuy.crawler.model.Article;
 import com.hohuy.crawler.service.ArticleParser;
 
 import uk.org.lidalia.slf4jext.Logger;
@@ -26,12 +29,15 @@ import uk.org.lidalia.slf4jext.LoggerFactory;
 @Component
 @Scope("singleton")
 public class ArticleParserImpl implements ArticleParser{
-	
+
 	private static ArticleParserImpl articleParser;
 	protected static final Logger logger = LoggerFactory.getLogger(ArticleParserImpl.class);
+
+	public static List<String> visitedUrl = Collections.synchronizedList(new ArrayList<String>());
+
 	private ArticleParserImpl() {
 	}
-	
+
 	public static ArticleParserImpl getInstance() {
 		return articleParser;
 	}
@@ -39,56 +45,53 @@ public class ArticleParserImpl implements ArticleParser{
 	@PostConstruct
 	private void load() {
 		articleParser = this;
-		logger.info("WpPost Parser Started...");
+		logger.info("Article Parser Started...");
 		logger.info("===== REGEXP: " + urlRegexp + " ==== CATE: " + category);
 		logger.info("== Gotta grep Title attribute from " + titleSelector);
 		logger.info("== Gotta grep Body attribute from " + fullcontentSelector);
 		logger.info("== Gotta grep FeatureImgUrl attribute from " + imgSelector);
 		logger.info("== Gotta grep PublishAt attribute from " + timeSelector);
 		logger.info("== Gotta grep Tags attribute from " + tagSelector);
-		
+
 		datePattern = Pattern.compile(dateFmt.replaceAll("[dMy]", "\\\\d?"));
 		logger.info("== Date format: " + dateFmt + " == Pattern " + datePattern.pattern());
-		
+
 		uriPattern = Pattern.compile(uriRegexp);
 		logger.info("== Article URI format: " + uriRegexp + " == Pattern " + uriPattern.pattern());
 	}
-	
+
 	@Value("${crawler.article.title-selector: .leftCol h1}")
 	private String titleSelector;
-	
+
 	@Value("${crawler.article.body-selector: .fulltext_content}")
 	private String fullcontentSelector;
-	
+
 	@Value("${crawler.article.time-selector:.cate_time}")
 	private String timeSelector;
-	
+
 	@Value("${crawler.article.img-selector:.dtBoxl img}")
 	private String imgSelector;
-	
+
 	@Value("${crawler.article.urlRegexp}")
 	private String urlRegexp;
-	
-	@Value("${crawler.article.main-category:WpPost}")
+
+	@Value("${crawler.article.main-category:Article}")
 	private String category;
-	
+
 	@Value("${crawler.article.tag-selector:.tag}")
 	private String tagSelector;
-	
+
 	@Value("${crawler.article.uri:\\/([\\w_\\-]+)}")
 	private String uriRegexp;
 	private Pattern uriPattern;
 
-	@Autowired
-	private WpPostRepository articleRepo;
-	
 	private Pattern hourPattern = Pattern.compile("\\d{2}:\\d{2}");
-	
+
 	@Value("${crawler.article.dateFmt:dd/MM/yyyy}")
-	private String dateFmt; 
+	private String dateFmt;
 	private Pattern datePattern;
-	
-	
+
+
 	@Override
 	public boolean parseAndSaveHtml(String srcUrl){
 		try {
@@ -100,29 +103,42 @@ public class ArticleParserImpl implements ArticleParser{
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean parseAndSaveHtml(Document doc, String srcUrl){
+		visitedUrl.add(srcUrl);
+		// Extract the title
 		Elements titles = doc.select(titleSelector);
         if (!titles.isEmpty()){
-        	WpPost entity = new WpPost();
-    		entity.setToPing(srcUrl);
-//			try {
-//				URL url = new URL(srcUrl);
-//				String base = url.getProtocol() + "://" + url.getHost();
-//				entity.setBaseUrl(base);
-//			} catch (MalformedURLException e1) {
-//				logger.debug("Cannot find the base URL for target web");
-//			}
-    		//entity.setCate(category);
+        	Article entity = new Article();
+
+        	// Extract srcUrl
+    		entity.setSrcUrl(srcUrl);
+
+    		// Extract baseUrl
+			try {
+				URL url = new URL(srcUrl);
+				String base = url.getProtocol() + "://" + url.getHost();
+				entity.setBaseUrl(base);
+			} catch (MalformedURLException e1) {
+				logger.debug("Cannot find the base URL for target web");
+			}
+
+			// Set Category
+    		entity.setCate(category);
+
+    		// Set title
     		String title = titles.get(0).text();
-    		entity.setPostTitle(title);
+    		entity.setTitle(title);
+
+    		// Set slug
     		Matcher m = uriPattern.matcher(srcUrl);
     		if (m.find()){
-    			entity.setPostName(m.group(m.groupCount()));
+    			entity.setSlug(m.group(m.groupCount()));
     		} else {
-    			entity.setPostName(title.toLowerCase().replaceAll("^[a-z0-9\\-]", ""));
+    			entity.setSlug(title.toLowerCase().replaceAll("^[a-z0-9\\-]", ""));
     		}
+
         	// Full content
         	Elements fulltext_content = doc.select(fullcontentSelector);
         	if (!fulltext_content.isEmpty()){
@@ -130,9 +146,10 @@ public class ArticleParserImpl implements ArticleParser{
         		for (Element e : fulltext_content){
         			fulltext_html += e.html();
         		}
-        		entity.setPostContent(fulltext_html);
+        		entity.setFullcontent(fulltext_html);
         	}
-        	// WpPost time
+
+        	// Set publish time
         	Elements time = doc.select(timeSelector);
         	if (!time.isEmpty()){
         		String timeString = time.get(0).html();
@@ -141,85 +158,67 @@ public class ArticleParserImpl implements ArticleParser{
     			try {
     				Matcher hourMatcher = hourPattern.matcher(timeString);
     				Matcher dateMatcher = datePattern.matcher(timeString);
-    				
+
     				if (dateMatcher.find()){
     					if (hourMatcher.find()){
     						String normalizedTimeString = dateMatcher.group() + " " + hourMatcher.group();
     						logger.info("Found normallized timeString: " + normalizedTimeString + " -- parse with format :" + dateFmt + " hh:mm");
-    						entity.setPostDate(fmt.parse(normalizedTimeString));
+    						entity.setPublishAt(fmt.parse(normalizedTimeString));
     					} else {
     						String normalizedTimeString = dateMatcher.group() + " 00:00";
     						logger.info("Found normallized timeString: " + normalizedTimeString + " -- parse with format :" + dateFmt + " hh:mm");
-    						entity.setPostDate(fmt.parse(dateMatcher.group() + " 00:00"));
+    						entity.setPublishAt(fmt.parse(dateMatcher.group() + " 00:00"));
     					}
     				} else {
     					logger.error("Cannot find any date time value with timeString. Please check your configuration..");
-    					entity.setPostDate(new Date());
     				}
-    				
+
     			} catch (Exception e) {
     				// TODO Auto-generated catch block
     				logger.error("Cannot parse date string" + timeString);
-    				entity.setPostDate(new Date());
+    				entity.setPublishAt(new Date());
     			}
-    			entity.setPostDateGmt(entity.getPostDate());
-    			entity.setPostModified(entity.getPostDate());
-    			entity.setPostModifiedGmt(entity.getPostDate());
         	}
         	// Feature Images
-        	// FIXME: Need to insert featured image
-//        	Elements img = doc.select(imgSelector);
-//        	if (!img.isEmpty()){
-//        		String imgUrl = img.get(0).attr("src");
-//        		entity.setFeatureImgUrl(imgUrl);
-//        	}
+        	Elements img = doc.select(imgSelector);
+        	if (!img.isEmpty()){
+        		String imgUrl = img.get(0).attr("src");
+        		entity.setFeatureImgUrl(imgUrl);
+        	}
         	// Tags
-        	// FIXME: Need to insert tags
-//        	Elements tags = doc.select(tagSelector);
-//        	if (!tags.isEmpty()){
-//        		List<String> tagStrings = new ArrayList<String>();
-//        		for (Element tag:tags){
-//        			tagStrings.add(tag.text());
-//        		}
-//        		entity.setTags(tagStrings);
-//        	} else {
-//        		try {
-//        			String[] metaKeywords = doc.select("meta[name=keywords]").get(0).attr("content").split(",");
-//        			for (String s:metaKeywords){
-//        				entity.getTags().add(s);
-//        			}
-//				} catch (Exception e) {
-//					logger.debug("Cannot find associate keywords or tags to WpPost");
-//				}
-//        	}
+        	Elements tags = doc.select(tagSelector);
+        	if (!tags.isEmpty()){
+        		List<String> tagStrings = new ArrayList<String>();
+        		for (Element tag:tags){
+        			tagStrings.add(tag.text());
+        		}
+        		entity.setTags(tagStrings);
+        	} else {
+        		try {
+        			String[] metaKeywords = doc.select("meta[name=keywords]").get(0).attr("content").split(",");
+        			for (String s:metaKeywords){
+        				entity.getTags().add(s);
+        			}
+				} catch (Exception e) {
+					logger.debug("Cannot find associate keywords or tags to article");
+				}
+        	}
         	// Save the entity and we are done
-        	logger.info("Saving data crawled for URL: " + srcUrl + " --> " + entity.getPostTitle());
-        	// Set default values for post
-        	entity.setPostType("post");
-        	entity.setPostStatus("publish");
-        	entity.setCommentStatus("open");
-        	entity.setCommentCount(0);
-        	entity.setGuid(srcUrl);
-        	entity.setPinged("");
-        	entity.setPostContentFiltered("");
-        	entity.setPostPassword("");
-        	entity.setPostExcerpt("");
-        	entity.setPostMimeType("");
-        	//
-        	articleRepo.save(entity);
+        	logger.debug("Saving data crawled for URL: " + entity.getSrcUrl() + " --> " + entity.getTitle());
+        	logger.info(entity.toString());
         }
 		return false;
 	}
-	
+
 	@Override
 	public boolean parseAndSaveHtml(String html, String srcUrl){
 		Document doc = Jsoup.parse(html);
 		return parseAndSaveHtml(doc, srcUrl);
 	}
-	
+
 	@Override
 	public boolean shouldGrab(String url){
-		return (url.startsWith(urlRegexp) && (articleRepo.findBySrcUrl(url) == null));
+		return (url.startsWith(urlRegexp) && (!visitedUrl.contains(url)));
 	}
 
 	public String getUrlRegexp() {
@@ -268,14 +267,6 @@ public class ArticleParserImpl implements ArticleParser{
 
 	public void setCategory(String category) {
 		this.category = category;
-	}
-
-	public WpPostRepository getArticleRepo() {
-		return articleRepo;
-	}
-
-	public void setArticleRepo(WpPostRepository articleRepo) {
-		this.articleRepo = articleRepo;
 	}
 
 	public Pattern getHourPattern() {
