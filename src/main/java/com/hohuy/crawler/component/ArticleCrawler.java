@@ -12,16 +12,16 @@ import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
-import uk.org.lidalia.slf4jext.Logger;
-import uk.org.lidalia.slf4jext.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Component
 @Configuration
 public class ArticleCrawler extends WebCrawler{
 	protected static final Logger logger = LoggerFactory.getLogger(ArticleCrawler.class);
 	private static final Pattern IMAGE_EXTENSIONS = Pattern.compile(".*\\.(bmp|gif|jpg|png)$");
-	
-	
-	
+
+
+
 //	@Autowired
 //	private ArticleParser parser;
 
@@ -67,7 +67,7 @@ public class ArticleCrawler extends WebCrawler{
 	    if (page.getParseData() instanceof HtmlParseData) {
 	      HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 	      String html = htmlParseData.getHtml();
-	      
+
 	      ArticleParser parser = ArticleParserImpl.getInstance();
 	      parser.parseAndSaveHtml(html, url);
 	    }
